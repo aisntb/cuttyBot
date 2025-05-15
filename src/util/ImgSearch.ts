@@ -53,32 +53,3 @@ export const ImgSearchByLink = async(imgURL:string) => {
     console.error(error);
   }
 }
-
-
-import { LanguageServiceClient } from "@google-cloud/language";
-  
-
-const people=[]
-export async function analyzeEntities(texts:string[]) {
-  const client = new LanguageServiceClient();
-
-  const document = {
-    content: texts.join('\n'),
-    type: 'PLAIN_TEXT',
-    language: 'ko',
-  };
-
-  const [result] = await client.analyzeEntities({ document });
-    result.entities.forEach(entity => {
-    console.log(entity.name, '→', entity.type);
-    if (entity.type === 'PERSON') {
-        entity.mentions.forEach(mention => {
-        // mention.type도 확인해 보고 싶으면 출력해 보세요
-        if (mention.type === 'PROPER') { 
-            people.push(mention.text.content);
-        }
-        });
-    }
-  });
-  console.log(people)
-}

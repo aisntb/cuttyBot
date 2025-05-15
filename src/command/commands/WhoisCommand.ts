@@ -17,7 +17,7 @@ export class WhoIsCommand implements ICommand{
             
             if(original.data[0].message == '사진 n장'){
                 const image = JSON.parse(original.data[0]?.attachment)
-                const result:{result:string[], related: string[]} = await ImgSearchByLink(image.imageUrls[0])
+                const result:{result:string[], related: string[]} = await ImgSearchByLink(image.imageUrls[0]) || {related:[], result:[]}
                 if(!result) return event.replyText('이미지 검색 중 에러가 발생했습니다.')
                 if(!result.result[0]&&!result.related[0]) return event.replyText('이미지 검색결과가 없습니다.')
                 const freq = frequency(result.result).slice(0,5).map(e=>'#'+e.word)
@@ -30,7 +30,7 @@ export class WhoIsCommand implements ICommand{
                 return
             }
             const image = JSON.parse(original.data[0]?.attachment)
-            const result:{result:string[], related: string[]} = await ImgSearchByLink(image.url)
+            const result:{related: string[],result:string[]} = await ImgSearchByLink(image.url) || {related:[], result:[]}
             if(!result) return event.replyText('이미지 검색 중 에러가 발생했습니다.')
             if(!result.result[0]&&!result.related[0]) return event.replyText('이미지 검색결과가 없습니다.')
             const freq = frequency(result.result).slice(0,5).map(e=>'#'+e.word)
@@ -57,13 +57,14 @@ export class WhoIsCommand implements ICommand{
     
 }
 
+
 const frequency = (searchResults: string[]) =>{
     const text = searchResults.join(" ");
     // 한글 단어만 뽑아내기 (정규식으로)
     const words = text.match(/[가-힣]{2,}/g) || [];
 
     // 빈도수 객체 생성
-    const freq = {};
+    const freq:{ [word: string]: number } = {};
     for (const word of words) {
     freq[word] = (freq[word] || 0) + 1;
     }
